@@ -75,6 +75,7 @@ class DbHelper {
       List<Map> result = await database
           .query(tableName, where: '$taskIsCompleteColumn=?', whereArgs: [1]);
       print("rRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR$result");
+      return result;
     } on Exception catch (e) {
       print(e);
     }
@@ -85,6 +86,7 @@ class DbHelper {
       database = await initDatabase();
       List<Map> result = await database
           .query(tableName, where: '$taskIsCompleteColumn=?', whereArgs: [0]);
+      return result;
     } on Exception catch (e) {
       print(e);
     }

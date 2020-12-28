@@ -1,6 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterassignment3/database/dbHelper.dart';
+import 'package:flutterassignment3/provider/app_provider.dart';
+import 'package:provider/provider.dart';
 
 import 'model/task.dart';
 
@@ -10,18 +12,28 @@ class AddTask extends StatefulWidget {
 }
 
 class _AddTaskState extends State<AddTask> {
+  AppProvider appProvider;
   String nameTask;
   bool isComplete=false;
   GlobalKey<FormState> key = GlobalKey();
 
+
   saveForm() {
     if (key.currentState.validate()) {
         key.currentState.save();
-        DbHelper.dbHelper.insertNewTask(new Task(taskName: nameTask,isCompleted: isComplete));
+      appProvider.addTask(Task(taskName:nameTask,isCompleted: isComplete));
+      Navigator.pop(context);
     } else {
       Scaffold.of(context).showSnackBar(
           SnackBar(content: Text("Empty")));
     }
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    appProvider = Provider.of(context,listen: false);
   }
   @override
   Widget build(BuildContext context) {

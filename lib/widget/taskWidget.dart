@@ -1,21 +1,27 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutterassignment3/database/dbHelper.dart';
 import 'package:flutterassignment3/model/task.dart';
-import 'package:flutterassignment3/toDoTasks.dart';
+import 'package:flutterassignment3/provider/app_provider.dart';
+import 'package:provider/provider.dart';
 
-
-class TaskWidget extends StatefulWidget  {
+class TaskWidget extends StatefulWidget {
   Task task;
-  Function function;
 
-  TaskWidget(this.task, [this.function]);
+  TaskWidget(this.task);
 
   @override
   _TaskWidgetState createState() => _TaskWidgetState();
 }
 
 class _TaskWidgetState extends State<TaskWidget> {
+  AppProvider appProvider;
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    appProvider = Provider.of(context, listen: false);
+  }
+
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
@@ -30,18 +36,33 @@ class _TaskWidgetState extends State<TaskWidget> {
                 value: widget.task.isCompleted,
                 onChanged: (value) {
                   this.widget.task.isCompleted = !this.widget.task.isCompleted;
-                  setState(() {});
-                  DbHelper.dbHelper.updateTask(widget.task);
-                  widget.function();
-
+                  appProvider.updateTask(widget.task);
                 }),
             Text(widget.task.taskName),
             IconButton(
               icon: Icon(Icons.delete),
               onPressed: () {
-                DbHelper.dbHelper.deleteTask(widget.task);
-                setState(() {});
-                widget.function();
+                showDialog(
+                  context: context,
+                  child: AlertDialog(
+                    title: Text('Are you sure?'),
+                    actions: [
+                      FlatButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                          appProvider.deleteTask(widget.task);
+                        },
+                        child: Text('Confirm'),
+                      ),
+                      FlatButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        child: Text('Cancel'),
+                      ),
+                    ],
+                  ),
+                );
               },
             ),
           ],

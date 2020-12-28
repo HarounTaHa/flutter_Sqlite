@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutterassignment3/provider/app_provider.dart';
 import 'package:flutterassignment3/widget/taskWidget.dart';
+import 'package:provider/provider.dart';
 
 import 'addTask.dart';
 import 'database/dbHelper.dart';
@@ -12,11 +14,13 @@ class ToDoTasks extends StatefulWidget {
 
 class _ToDoTasksState extends State<ToDoTasks> with TickerProviderStateMixin {
   TabController tabController;
+  AppProvider appProvider;
 
   @override
   void initState() {
     super.initState();
     tabController = TabController(length: 3, vsync: this);
+    appProvider = Provider.of<AppProvider>(context,listen: false);
   }
 
   @override
@@ -66,49 +70,32 @@ class AllTask extends StatefulWidget {
 }
 
 class _AllTaskState extends State<AllTask> {
-  int length;
-
-  Future getData() async {
-    List<Map> result = await DbHelper.dbHelper.selectAllTasks();
-    print("ssssssssssssssssssssssssssssssssss$result");
-    length = result.map((e) => Task.fromJson(e)).toList().length;
-    print("kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk$length");
-    return result.map((e) => Task.fromJson(e)).toList();
-  }
+  AppProvider appProvider;
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+    appProvider =  Provider.of<AppProvider>(context,listen: false);
   }
 
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
     return Container(
-      child: FutureBuilder(
-          future: getData(),
-          builder: (BuildContext context, AsyncSnapshot snapshot) {
-            if (snapshot.hasData) {
-              return ListView.builder(
-                itemCount: length,
-                itemBuilder: (context, i) {
-                  return TaskWidget(snapshot.data[i]);
-                },
-              );
-            }
-            return Scaffold(
-              body: Container(
-                child: Center(
-                  child: Column(
-                    children: [
-                      CircularProgressIndicator(),
-                    ],
-                  ),
-                ),
-              ),
-            );
-          }),
+      child:
+      Consumer<AppProvider>(
+        builder: (context,value,child){
+          print('rebuiild');
+          return Container(
+          child: ListView.builder(
+              itemCount: value.allTasks.length,
+              itemBuilder: (context, i) {
+                return TaskWidget(value.allTasks[i]);
+              }),
+        );
+        },
+      ),
     );
   }
 }
@@ -120,50 +107,28 @@ class CompleteTask extends StatefulWidget {
 }
 
 class _CompleteTaskState extends State<CompleteTask> {
-  int length;
-  List<Map> result;
 
-  Future getDataComplete() async {
-    List<Map> result = await DbHelper.dbHelper.selectCompletedTasks();
-    print("ssssssssssssssssssssssssssssssssss$result");
-    length = result.map((e) => Task.fromJson(e)).toList().length;
-    print("kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk$length");
-    return result.map((e) => Task.fromJson(e)).toList();
-  }
+  AppProvider appProvider;
 
   @override
   void initState() {
+    // TODO: implement initState
     super.initState();
+    appProvider =  Provider.of<AppProvider>(context,listen: false);
   }
+
 
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
-    return Container(
-      child: FutureBuilder(
-          future: getDataComplete(),
-          builder: (BuildContext context, AsyncSnapshot snapshot) {
-            if (snapshot.hasData) {
-              return ListView.builder(
-                itemCount: length,
-                itemBuilder: (context, i) {
-                  return TaskWidget(snapshot.data[i]);
-                },
-              );
-            }
-            return Scaffold(
-              body: Container(
-                child: Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      CircularProgressIndicator(),
-                    ],
-                  ),
-                ),
-              ),
-            );
-          }),
+    return Consumer<AppProvider>(
+      builder: (context,value,child)=> Container(
+        child: ListView.builder(
+            itemCount: value.completedTasks.length,
+            itemBuilder: (context, i) {
+              return TaskWidget(value.completedTasks[i]);
+            }),
+      ),
     );
   }
 }
@@ -175,50 +140,27 @@ class InCompleteTask extends StatefulWidget {
 }
 
 class _InCompleteTaskState extends State<InCompleteTask> {
-  List<Task> taskList;
-  Task task;
-  int length;
 
-  Future getDataInComplete() async {
-    List<Map> result = await DbHelper.dbHelper.selectInCompletedTasks();
-    print("ssssssssssssssssssssssssssssssssss$result");
-    length = result.map((e) => Task.fromJson(e)).toList().length;
-    print("kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk$length");
-    return result.map((e) => Task.fromJson(e)).toList();
-  }
+  AppProvider appProvider;
 
-  init() {
-    setState(() {});
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    appProvider =  Provider.of<AppProvider>(context,listen: false);
   }
 
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
-    return Container(
-      child: FutureBuilder(
-          future: getDataInComplete(),
-          builder: (BuildContext context, AsyncSnapshot snapshot) {
-            if (snapshot.hasData) {
-              return ListView.builder(
-                itemCount: length,
-                itemBuilder: (context, i) {
-                  return TaskWidget(snapshot.data[i]);
-                },
-              );
-            }
-            return Scaffold(
-              body: Container(
-                child: Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      CircularProgressIndicator(),
-                    ],
-                  ),
-                ),
-              ),
-            );
-          }),
+    return Consumer<AppProvider>(
+      builder: (context,value,child)=> Container(
+        child: ListView.builder(
+            itemCount: value.inCompletedTasks.length,
+            itemBuilder: (context, i) {
+              return TaskWidget(value.inCompletedTasks[i]);
+            }),
+      ),
     );
   }
 }
